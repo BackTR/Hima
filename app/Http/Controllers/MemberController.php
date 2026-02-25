@@ -80,6 +80,7 @@ public function update(Request $request, string $id)
         'divisi'   => 'nullable|string|max:100',
         'nim'      => 'nullable|string|max:50',
         'angkatan' => 'nullable|string|max:10',
+        
     ]);
 
     DB::transaction(function () use ($request, $user) {

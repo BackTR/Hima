@@ -8,9 +8,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'role:superadmin,admin,pengurus,anggota'])->name('dashboard');
+Route::get('/dashboard',
+    [App\Http\Controllers\DashboardController::class,'index'])
+->middleware(['auth', 'role:superadmin,admin,pengurus,anggota'])->name('dashboard');
 
 Route::middleware(['auth', 'role:superadmin,admin'])->group(function(){
     Route::resource('members', MemberController::class);
