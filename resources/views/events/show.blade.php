@@ -17,6 +17,9 @@
                 <p class="text-gray-600 mt-4">{{ $event->deskripsi ?? '-' }}</p>
 
                 <div class="flex gap-2 mt-6">
+                    <a href="{{ route('attendances.index', $event->id) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Kelola Absensi
+                    </a>
                     <a href="{{ route('events.edit', $event->id) }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                         Edit Event
                     </a>

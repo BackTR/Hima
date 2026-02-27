@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::get('/', function () {
     return view('welcome');//public
@@ -33,7 +33,10 @@ Route::middleware(['auth'])->group(function (){
 
     // Superadmin, Admin & Pengurus
     Route::middleware('role:superadmin,admin,pengurus')->group(function () {
-       Route::resource('events', EventController::class); 
+       Route::resource('events', EventController::class);
+       Route::get('events/{events_id}/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+       Route::post('events/{events_id}/attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+       Route::delete('events/{event_id}/attendances/{id}', [AttendanceController::class, 'destroy'])->name('attendances.destroy');
     // untuk event
     });
 
