@@ -15,9 +15,21 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('members.index')" :active="request()->routeIs('members.*')">
-        {{ __('Anggota') }}
-    </x-nav-link>
+
+                    @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
+                        <x-nav-link :href="route('members.index')" :active="request()->routeIs('members.*')">
+                            {{ __('Anggota') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('activity-log.index')" :active="request()->routeIs('activity-logs.*')">
+                            {{ __('Activity Log') }}
+                        </x-nav-link>
+                    @endif
+                    @if (in_array(Auth::user()->role, ['superadmin','admin', 'pengurus']))
+                        <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
+                            {{ __('Event') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
