@@ -25,8 +25,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        // $key =Str::lower($request->input('email')). '|' . $request->ip();
+        // if (RateLimiter::tooManyAttempts($key, 5)){
+        //     $seconds = RateLimiter::availableIn($key);
+        //     return back()->withErrors([
+        //         'email' => 'Terlalu banyak percobaan login dalam' .$seconds. 'detik'
+        //     ]);
+        // }
+        // RateLimiter::hit($key, 60);
 
+        $request->authenticate();
+        // RateLimiter::clear($key);
         $request->session()->regenerate();
 
         LogActivity::log('login', 'User login', 'User', Auth::id());

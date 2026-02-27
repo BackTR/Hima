@@ -28,15 +28,15 @@ class MemberController extends Controller
     public function store(Request $request)
     {
             $request->validate([
-                'name'     => 'required|string|max:255',
-                'email'    => 'required|email|unique:users,email',
-                'password' => 'required|min:8',
+                'name'     => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
+                'email'    => 'required|email:rfc,dns|unique:users,email',
+                'password' => 'required|min:8|confirmed',
                 'role'     => 'required|in:superadmin,admin,pengurus,anggota',
-                'no_hp'    => 'nullable|string|max:20',
-                'alamat'   => 'nullable|string',
+                'no_hp'    => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
+                'alamat'   => 'nullable|string|max:500',
                 'divisi'   => 'nullable|string|max:100',
-                'nim'      => 'nullable|string|max:50',
-                'angkatan' => 'nullable|string|max:10',
+                'nim'      => 'nullable|string|max:20',
+                'angkatan' => 'nullable|digits:4',
             ]);
 
         DB::transaction(function () use ($request) {
@@ -73,17 +73,16 @@ public function update(Request $request, string $id)
 {
     $user = User::findOrFail($id);
 
-    $request->validate([
-        'name'     => 'required|string|max:255',
-        'email'    => 'required|email|unique:users,email,' . $user->id,
-        'role'     => 'required|in:superadmin,admin,pengurus,anggota',
-        'no_hp'    => 'nullable|string|max:20',
-        'alamat'   => 'nullable|string',
-        'divisi'   => 'nullable|string|max:100',
-        'nim'      => 'nullable|string|max:50',
-        'angkatan' => 'nullable|string|max:10',
-        
-    ]);
+        $request->validate([
+            'name'     => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
+            'email'    => 'required|email:rfc,dns|unique:users,email,' . $user->id,
+            'role'     => 'required|in:superadmin,admin,pengurus,anggota',
+            'no_hp'    => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
+            'alamat'   => 'nullable|string|max:500',
+            'divisi'   => 'nullable|string|max:100',
+            'nim'      => 'nullable|string|max:20',
+            'angkatan' => 'nullable|digits:4',
+        ]);
 
     DB::transaction(function () use ($request, $user) {
 $user->update([

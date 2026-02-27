@@ -35,10 +35,10 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_event'    => 'required|string|max:255',
-            'tanggal'       =>'required|date',
-            'lokasi'        =>'nullable|string|max:255',
-            'deskripsi'     =>'nullable|string'
+            'nama_event' => 'required|string|max:255',
+            'tanggal'    => 'required|date|after_or_equal:today',
+            'lokasi'     => 'nullable|string|max:255',
+            'deskripsi'  => 'nullable|string|max:1000',
         ]);
 
         $event = Event::create([
@@ -81,9 +81,9 @@ class EventController extends Controller
 
         $request->validate([
             'nama_event' => 'required|string|max:255',
-            'tanggal'    => 'required|date',
+            'tanggal'    => 'required|date|after_or_equal:today',
             'lokasi'     => 'nullable|string|max:255',
-            'deskripsi'  => 'nullable|string',
+            'deskripsi'  => 'nullable|string|max:1000',
         ]);
 
         $event->update([
