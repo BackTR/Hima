@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,7 @@ Route::get('/dashboard',
 
 Route::middleware(['auth', 'role:superadmin,admin'])->group(function(){
     Route::resource('members', MemberController::class);
+    Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-log.index');
 });
 
 Route::middleware('auth')->group(function () {

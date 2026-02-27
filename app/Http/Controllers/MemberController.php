@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LogActivity;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,6 +58,7 @@ class MemberController extends Controller
                 'status'   => 'aktif',
             ]);
         });
+        LogActivity::log('create', 'Menambah anggota baru: ' . $request->name, 'User');
 
         return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
@@ -102,6 +104,7 @@ $user->update([
             ]
         );
     });
+    LogActivity::log('update', 'Mengupdate anggota: ' . $user->name, 'User', $id);
 
     return redirect()->route('members.index')->with('success', 'Anggota berhasil diupdate!');
 }
@@ -114,6 +117,7 @@ public function destroy(string $id)
         $user->member()->delete();
         $user->delete();
     });
+    LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $id);
 
     return redirect()->route('members.index')->with('success', 'Anggota berhasil dihapus!');
 }
