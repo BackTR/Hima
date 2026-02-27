@@ -38,7 +38,10 @@
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('members.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     👥 Anggota
                 </a>
-
+                <a href="{{ route('kaderisasi.index') }}"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('kaderisasi.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                    🎓 Kaderisasi
+                </a>
                 <a href="{{ route('activity-log.index') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('activity-log.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     📋 Activity Log

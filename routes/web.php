@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\KaderisasiController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,7 @@ Route::middleware(['auth'])->group(function (){
     Route::middleware(['auth', 'role:superadmin,admin'])->group(function(){
         Route::resource('members', MemberController::class);
         Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-log.index');
+        Route::resource('kaderisasi', KaderisasiController::class);
     });
 
     // Superadmin, Admin & Pengurus

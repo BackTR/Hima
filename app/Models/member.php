@@ -21,8 +21,12 @@ class Member extends Model
     }
 
     public function attendances()
-{
+    {
     return $this->hasMany(Attendance::class);
-}
+    }
 
+    public function kaderisasi()
+    {
+    return $this->hasOne(Kaderisasi::class);
+    }
 }
