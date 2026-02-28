@@ -57,8 +57,9 @@ class MemberController extends Controller
                 'alamat'   => $request->alamat,
                 'status'   => 'aktif',
             ]);
+            LogActivity::log('create', 'Menambah anggota baru: ' . $request->name, 'User');
         });
-        LogActivity::log('create', 'Menambah anggota baru: ' . $request->name, 'User');
+        
 
         return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
@@ -85,12 +86,14 @@ public function update(Request $request, string $id)
         ]);
 
     DB::transaction(function () use ($request, $user) {
-$user->update([
-    'name'      => $request->name,
-    'email'     => $request->email,
-    'role'      => $request->role,
-    'is_active' => $request->is_active == '1' ? true : false,
-]);
+        $user->update([
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'role'      => $request->role,
+            'is_active' => $request->is_active == '1' ? true : false,
+        ]);
+        //sinkronisasi status
+        $memberStatus = $request->is_active == '1' ? 'aktif' : 'nonaktif';
 
         $user->member()->updateOrCreate(
             ['user_id' => $user->id],
@@ -100,10 +103,12 @@ $user->update([
                 'divisi'   => $request->divisi,
                 'no_hp'    => $request->no_hp,
                 'alamat'   => $request->alamat,
+                'status'   => $memberStatus
             ]
         );
+            LogActivity::log('update', 'Mengupdate anggota: ' . $user->name, 'User', $user->id);
     });
-    LogActivity::log('update', 'Mengupdate anggota: ' . $user->name, 'User', $id);
+
 
     return redirect()->route('members.index')->with('success', 'Anggota berhasil diupdate!');
 }
@@ -115,8 +120,9 @@ public function destroy(string $id)
     DB::transaction(function () use ($user) {
         $user->member()->delete();
         $user->delete();
+        LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
     });
-    LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $id);
+
 
     return redirect()->route('members.index')->with('success', 'Anggota berhasil dihapus!');
 }
