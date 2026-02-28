@@ -12,9 +12,11 @@
 
         <div class="flex justify-between mb-4">
             <h3 class="text-lg font-semibold text-white">Total: {{ $members->total() }} Anggota</h3>
+            @if (in_array(Auth::user()->role, ['superadmin', 'admin']))  
             <a href="{{ route('members.create') }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
                 + Tambah Anggota
             </a>
+            @endif
         </div>
 
         <table class="w-full text-left border-collapse">
@@ -41,12 +43,14 @@
                         </span>
                     </td>
                     <td class="p-3 border border-gray-700">
+                        @if (in_array(Auth::user()->role, ['superadmin', 'admin']))
                         <a href="{{ route('members.edit', $user->id) }}" class="text-indigo-400 hover:underline mr-2">Edit</a>
                         <form action="{{ route('members.destroy', $user->id) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-400 hover:underline" onclick="return confirm('Yakin hapus anggota ini?')">Hapus</button>
                         </form>
+                        @endif
                     </td>
                 </tr>
                 @endforeach

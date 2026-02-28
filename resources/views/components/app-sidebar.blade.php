@@ -26,6 +26,16 @@
                 📊 Dashboard
             </a>
 
+            <a href="{{ route('anggota.profil') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('anggota.profil') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                👤 Profil Saya
+            </a>
+
+            <a href="{{ route('anggota.riwayat') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('anggota.riwayat') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                📝 Riwayat Kehadiran
+            </a>
+
             @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'pengurus']))
                 <a href="{{ route('events.index') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
@@ -33,11 +43,14 @@
                 </a>
             @endif
 
-            @if(in_array(Auth::user()->role, ['superadmin', 'admin']))
+            @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'pengurus']))
                 <a href="{{ route('members.index') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('members.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     👥 Anggota
                 </a>
+                @endif
+
+                @if (in_array(Auth::user()->role, ['superadmin', 'admin'])) 
                 <a href="{{ route('kaderisasi.index') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('kaderisasi.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     🎓 Kaderisasi
