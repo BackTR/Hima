@@ -21,4 +21,14 @@ class Event extends Model
     public function attendances(){
         return $this->hasMany(Attendance::class);
     }
+
+    public function session()
+    {
+        return $this->hasMany(EventSession::class);
+    }
+
+    public function activeSession()
+    {
+        return $this->hasOne(EventSession::class)->where('is_active', true)->where('expired_at', '>', now());
+    }
 }

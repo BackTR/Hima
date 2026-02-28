@@ -49,7 +49,9 @@
                         <option value="anggota">Anggota</option>
                         <option value="pengurus">Pengurus</option>
                         <option value="admin">Admin</option>
-                        <option value="superadmin">Super Admin</option>
+                        @if (Auth::user()->role === 'superadmin')
+                            <option value="superadmin">Super Admin</option>   
+                        @endif
                     </select>
                 </div>
 

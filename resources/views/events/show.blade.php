@@ -11,16 +11,39 @@
         <p class="text-gray-400 mt-4">{{ $event->deskripsi ?? '-' }}</p>
 
         <div class="flex gap-2 mt-6">
-            <a href="{{ route('attendances.index', $event->id) }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                Kelola Absensi
+        @if($event->activeSession)
+            <!-- Session aktif - tampilkan QR dan Tutup -->
+            <a href="{{ route('event-sessions.qr', $event->activeSession->id) }}" 
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                📷 Lihat QR Absensi
             </a>
-            <a href="{{ route('events.edit', $event->id) }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                Edit Event
-            </a>
-            <a href="{{ route('events.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-                Kembali
-            </a>
-        </div>
+            <form action="{{ route('event-sessions.stop', $event->id) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                    onclick="return confirm('Yakin tutup sesi absensi?')">
+                    🔒 Tutup Absensi
+                </button>
+            </form>
+        @else
+            <!-- Tidak ada session aktif - tampilkan Mulai Absensi -->
+            <form action="{{ route('event-sessions.start', $event->id) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    ▶️ Mulai Absensi
+                </button>
+            </form>
+        @endif
+
+        <a href="{{ route('attendances.index', $event->id) }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            📋 Kelola Absensi
+        </a>
+        <a href="{{ route('events.edit', $event->id) }}" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+            ✏️ Edit Event
+        </a>
+        <a href="{{ route('events.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Kembali
+        </a>
+            </div>
     </div>
 
     <!-- Daftar Kehadiran -->

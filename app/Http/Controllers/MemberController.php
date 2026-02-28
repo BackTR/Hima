@@ -6,6 +6,7 @@ use App\Helpers\LogActivity;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -117,10 +118,19 @@ public function destroy(string $id)
 {
     $user = User::findOrFail($id);
 
+    //super admin tidak dapat di hapus
+    if ($user->role=== 'superadmin'){
+        return redirect()->route('members.index')->with('error', 'Superadmin tidak dapat dihapus!');
+    }
+
+        if ($user->id === Auth::id()) {
+        return redirect()->route('members.index')->with('error', 'Kamu tidak dapat menghapus akun sendiri!');
+    }
+
     DB::transaction(function () use ($user) {
+        LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
         $user->member()->delete();
         $user->delete();
-        LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
     });
 
 
