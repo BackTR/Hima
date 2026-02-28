@@ -35,7 +35,12 @@
                 class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('anggota.riwayat') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                 📝 Riwayat Kehadiran
             </a>
-            <a href="{{ route('anggota.scan') }}"
+            {{-- <a href="{{ route('anggota.scan') }}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('anggota.scan') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                📷 Scan Absensi
+            </a> --}}
+
+                <a href="{{ route('anggota.scanQr') }}"
                 class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('anggota.scan') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                 📷 Scan Absensi
             </a>

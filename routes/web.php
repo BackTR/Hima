@@ -29,8 +29,9 @@ Route::middleware(['auth'])->group(function (){
     Route::middleware(['role:superadmin,admin,pengurus,anggota'])->group(function(){
         Route::get('profil', [AnggotaController::class, 'profil'])->name('anggota.profil');
         Route::get('riwayat',[AnggotaController::class, 'riwayat'])->name('anggota.riwayat');
-        Route::get('scan',[AnggotaController::class, 'scan'])->name('anggota.scan');
-        Route::post('scan', [AnggotaController::class, 'submitScan'])->name('anggota.submitScan');
+        // Route::get('scan',[AnggotaController::class, 'scan'])->name('anggota.scan');
+        // Route::post('scan', [AnggotaController::class, 'submitScan'])->name('anggota.submitScan');
+        Route::get('scan-qr', [AnggotaController::class, 'scanQr'])->name('anggota.scanQr');
         Route::get('absen/{token}', [EventSessionController::class, 'scan'])->name('event-sessions.scan');
     });
 

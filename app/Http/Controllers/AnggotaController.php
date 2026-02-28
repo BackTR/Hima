@@ -47,6 +47,11 @@ class AnggotaController extends Controller
     return back()->with('success', 'Berhasil scan! Kehadiran kamu sudah tercatat.');
     }
 
+        public function scanQr()
+    {
+        return view('anggota.scan_qr');
+    }
+
     // Profil anggota
     public function profil()
     {
