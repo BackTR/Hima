@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LogActivity;
 use App\Models\Attendance;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AnggotaController extends Controller
 {
@@ -76,4 +79,68 @@ class AnggotaController extends Controller
 
         return view('anggota.riwayat', compact('attendances'));
     }
+
+public function editProfil()
+{
+    $user = Auth::user();
+    $member = $user->member;
+    return view('anggota.edit_profil', compact('user', 'member'));
+}
+
+public function updateProfil(Request $request)
+{
+    $user = Auth::user();
+
+    $request->validate([
+        'name'   => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
+        'no_hp'  => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
+        'alamat' => 'nullable|string|max:500',
+    ]);
+
+    DB::transaction(function () use ($request, $user) {
+        $user->update([
+            'name' => $request->name,
+        ]);
+
+        $user->member()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'no_hp'  => $request->no_hp,
+                'alamat' => $request->alamat,
+            ]
+        );
+
+        LogActivity::log('update', 'Mengupdate profil sendiri', 'User', $user->id);
+    });
+
+    return redirect()->route('anggota.profil')->with('success', 'Profil berhasil diupdate!');
+}
+
+public function gantiPassword()
+{
+    return view('anggota.ganti_password');
+}
+
+public function updatePassword(Request $request)
+{
+    $user = Auth::user();
+
+    $request->validate([
+        'password_lama'  => 'required',
+        'password'       => 'required|min:8|confirmed',
+    ]);
+
+    // Cek password lama
+    if (!Hash::check($request->password_lama, $user->password)) {
+        return back()->withErrors(['password_lama' => 'Password lama tidak sesuai!']);
+    }
+
+    $user->update([
+        'password' => Hash::make($request->password),
+    ]);
+
+    LogActivity::log('update', 'Mengganti password sendiri', 'User', $user->id);
+
+    return redirect()->route('anggota.profil')->with('success', 'Password berhasil diubah!');
+}
 }

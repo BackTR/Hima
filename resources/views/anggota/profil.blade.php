@@ -28,7 +28,16 @@
                     </span>
                 </div>
             </div>
+            <div class="mt-4">
+                <a href="{{ route('anggota.editprofil') }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                ✏️ Edit Profil
+                </a>
+                <a href="{{ route('anggota.gantipassword') }}" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+                    🔑 Ganti Password
+                </a>
+            </div>
         </div>
+
 
         <!-- Info Member -->
         <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">

@@ -145,8 +145,15 @@ public function resetPassword(Request $request, string $id)
     if ($user->role === 'superadmin') {
         return redirect()->route('members.index')->with('error', 'Password superadmin tidak dapat direset!');
     }
+
+    $request->validate([
+        'password' => 'required|min:8|confirmed',
+    ]);
+
     $user->update(['password' => Hash::make($request->password)]);
+
     LogActivity::log('update', 'Mereset password anggota: ' . $user->name, 'User', $user->id);
+    
     return redirect()->route('members.index')->with('success', 'Password berhasil direset!');
 }
 }
