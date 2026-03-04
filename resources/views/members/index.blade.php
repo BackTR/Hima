@@ -43,6 +43,7 @@
                         </span>
                     </td>
                     <td class="p-3 border border-gray-700">
+                        <a href="{{ route('members.show', $user->id) }}" class="text-green-400 hover:underline mr-2">Detail</a>
                         @if (in_array(Auth::user()->role, ['superadmin', 'admin']))
                         <a href="{{ route('members.edit', $user->id) }}" class="text-indigo-400 hover:underline mr-2">Edit</a>
                         <button onclick="openResetModal({{ $user->id }}, '{{ $user->name }}')" 

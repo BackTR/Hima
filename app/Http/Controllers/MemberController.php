@@ -65,95 +65,101 @@ class MemberController extends Controller
         return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
 
-public function edit(string $id)
-{
+    public function edit(string $id)
+    {
     $user = User::with('member')->findOrFail($id);
     return view('members.edit', compact('user'));
-}
+    }
 
-public function update(Request $request, string $id)
-{
-    $user = User::findOrFail($id);
+    public function update(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
 
-        $request->validate([
-            'name'     => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
-            'email'    => 'required|email:rfc,dns|unique:users,email,' . $user->id,
-            'role'     => 'required|in:superadmin,admin,pengurus,anggota',
-            'no_hp'    => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
-            'alamat'   => 'nullable|string|max:500',
-            'divisi'   => 'nullable|string|max:100',
-            'nim'      => 'nullable|string|max:20',
-            'angkatan' => 'nullable|digits:4',
-        ]);
+            $request->validate([
+                'name'     => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
+                'email'    => 'required|email:rfc,dns|unique:users,email,' . $user->id,
+                'role'     => 'required|in:superadmin,admin,pengurus,anggota',
+                'no_hp'    => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
+                'alamat'   => 'nullable|string|max:500',
+                'divisi'   => 'nullable|string|max:100',
+                'nim'      => 'nullable|string|max:20',
+                'angkatan' => 'nullable|digits:4',
+            ]);
 
-    DB::transaction(function () use ($request, $user) {
-        $user->update([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'role'      => $request->role,
-            'is_active' => $request->is_active == '1' ? true : false,
-        ]);
-        //sinkronisasi status
-        $memberStatus = $request->is_active == '1' ? 'aktif' : 'nonaktif';
+        DB::transaction(function () use ($request, $user) {
+            $user->update([
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'role'      => $request->role,
+                'is_active' => $request->is_active == '1' ? true : false,
+            ]);
+            //sinkronisasi status
+            $memberStatus = $request->is_active == '1' ? 'aktif' : 'nonaktif';
 
-        $user->member()->updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'nim'      => $request->nim,
-                'angkatan' => $request->angkatan,
-                'divisi'   => $request->divisi,
-                'no_hp'    => $request->no_hp,
-                'alamat'   => $request->alamat,
-                'status'   => $memberStatus
-            ]
-        );
-            LogActivity::log('update', 'Mengupdate anggota: ' . $user->name, 'User', $user->id);
-    });
+            $user->member()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'nim'      => $request->nim,
+                    'angkatan' => $request->angkatan,
+                    'divisi'   => $request->divisi,
+                    'no_hp'    => $request->no_hp,
+                    'alamat'   => $request->alamat,
+                    'status'   => $memberStatus
+                ]
+            );
+                LogActivity::log('update', 'Mengupdate anggota: ' . $user->name, 'User', $user->id);
+        });
 
 
     return redirect()->route('members.index')->with('success', 'Anggota berhasil diupdate!');
-}
-
-public function destroy(string $id)
-{
-    $user = User::findOrFail($id);
-
-    //super admin tidak dapat di hapus
-    if ($user->role=== 'superadmin'){
-        return redirect()->route('members.index')->with('error', 'Superadmin tidak dapat dihapus!');
     }
 
-        if ($user->id === Auth::id()) {
-        return redirect()->route('members.index')->with('error', 'Kamu tidak dapat menghapus akun sendiri!');
+    public function destroy(string $id)
+    {
+        $user = User::findOrFail($id);
+
+        //super admin tidak dapat di hapus
+        if ($user->role=== 'superadmin'){
+            return redirect()->route('members.index')->with('error', 'Superadmin tidak dapat dihapus!');
+        }
+
+            if ($user->id === Auth::id()) {
+            return redirect()->route('members.index')->with('error', 'Kamu tidak dapat menghapus akun sendiri!');
+        }
+
+        DB::transaction(function () use ($user) {
+            LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
+            $user->member()->delete();
+            $user->delete();
+        });
+
+
+        return redirect()->route('members.index')->with('success', 'Anggota berhasil dihapus!');
     }
 
-    DB::transaction(function () use ($user) {
-        LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
-        $user->member()->delete();
-        $user->delete();
-    });
+    public function resetPassword(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
 
+        //super admin tidak dapat di reset passwordnya
+        if ($user->role === 'superadmin') {
+            return redirect()->route('members.index')->with('error', 'Password superadmin tidak dapat direset!');
+        }
 
-    return redirect()->route('members.index')->with('success', 'Anggota berhasil dihapus!');
-}
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
 
-public function resetPassword(Request $request, string $id)
-{
-    $user = User::findOrFail($id);
+        $user->update(['password' => Hash::make($request->password)]);
 
-    //super admin tidak dapat di reset passwordnya
-    if ($user->role === 'superadmin') {
-        return redirect()->route('members.index')->with('error', 'Password superadmin tidak dapat direset!');
+        LogActivity::log('update', 'Mereset password anggota: ' . $user->name, 'User', $user->id);
+        
+        return redirect()->route('members.index')->with('success', 'Password berhasil direset!');
     }
 
-    $request->validate([
-        'password' => 'required|min:8|confirmed',
-    ]);
+    public function show(string $id){
+        $user = User::with(['member', 'member.kaderisasi', 'member.attendances.event'])->findOrFail($id);
 
-    $user->update(['password' => Hash::make($request->password)]);
-
-    LogActivity::log('update', 'Mereset password anggota: ' . $user->name, 'User', $user->id);
-    
-    return redirect()->route('members.index')->with('success', 'Password berhasil direset!');
-}
+        return view('members.show', compact('user'));
+    }
 }
