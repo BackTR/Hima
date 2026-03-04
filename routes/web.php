@@ -41,6 +41,7 @@ Route::middleware(['auth'])->group(function (){
         Route::resource('members', MemberController::class)->except(['index', 'show']);
         Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-log.index');
         Route::resource('kaderisasi', KaderisasiController::class);
+        Route::post('members/{id}/reset-password', [MemberController::class, 'resetPassword'])->name('members.resetPassword');
     });
 
     // Superadmin, Admin & Pengurus // untuk event

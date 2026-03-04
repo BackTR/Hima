@@ -45,6 +45,10 @@
                     <td class="p-3 border border-gray-700">
                         @if (in_array(Auth::user()->role, ['superadmin', 'admin']))
                         <a href="{{ route('members.edit', $user->id) }}" class="text-indigo-400 hover:underline mr-2">Edit</a>
+                        <button onclick="openResetModal({{ $user->id }}, '{{ $user->name }}')" 
+                            class="text-yellow-400 hover:underline mr-2">
+                            Reset PW
+                        </button>
                         <form action="{{ route('members.destroy', $user->id) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
@@ -52,6 +56,7 @@
                         </form>
                         @endif
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>
@@ -63,4 +68,58 @@
 
     </div>
 
+<!-- Modal Reset Password -->
+<div id="resetModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl w-full max-w-sm mx-4">
+        
+        <!-- Header Modal -->
+        <div class="flex justify-between items-center p-5 border-b border-gray-700">
+            <div>
+                <h3 class="text-base font-semibold text-white">Reset Password</h3>
+                <p class="text-xs text-gray-400 mt-1">User: <span id="resetName" class="text-indigo-400"></span></p>
+            </div>
+            <button onclick="closeResetModal()" class="text-gray-400 hover:text-white text-xl">✕</button>
+        </div>
+
+        <!-- Body Modal -->
+        <form id="resetForm" method="POST" class="p-5">
+            @csrf
+
+            <div class="mb-4">
+                <label class="block text-xs font-medium text-gray-400 mb-1">Password Baru</label>
+                <input type="password" name="password" placeholder="Minimal 8 karakter"
+                    class="block w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white text-sm focus:border-indigo-500 focus:outline-none" required>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs font-medium text-gray-400 mb-1">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" placeholder="Ulangi password baru"
+                    class="block w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white text-sm focus:border-indigo-500 focus:outline-none" required>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 text-sm font-medium">
+                    Reset Password
+                </button>
+                <button type="button" onclick="closeResetModal()" class="flex-1 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 text-sm font-medium">
+                    Batal
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    function openResetModal(id, name) {
+        document.getElementById('resetName').textContent = name;
+        document.getElementById('resetForm').action = '/members/' + id + '/reset-password';
+        document.getElementById('resetModal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+        document.getElementById('resetModal').classList.add('hidden');
+    }
+</script>
 </x-app-sidebar>

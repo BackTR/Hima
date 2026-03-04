@@ -50,9 +50,7 @@
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     📅 Event
                 </a>
-            @endif
-
-            @if(in_array(Auth::user()->role, ['superadmin', 'admin', 'pengurus']))
+            
                 <a href="{{ route('members.index') }}"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('members.*') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                     👥 Anggota
