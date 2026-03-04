@@ -8,6 +8,12 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="bg-red-900 text-red-300 p-3 rounded mb-4 border border-red-700">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
 
         <div class="flex justify-between mb-4">

@@ -37,7 +37,7 @@ class MemberController extends Controller
                 'alamat'   => 'nullable|string|max:500',
                 'divisi'   => 'nullable|string|max:100',
                 'nim'      => 'nullable|string|max:20',
-                'angkatan' => 'nullable|digits:4',
+                'angkatan' => 'nullable|digits:2',
             ]);
 
         DB::transaction(function () use ($request) {
@@ -74,6 +74,27 @@ class MemberController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
+        $currentUser = Auth::user();
+
+        //defendsive: cek role yang menjalan kan aksi
+        if(!in_array($currentUser->role, ['superadmin', 'admin'])){
+            abort(403, 'akses Ditolak');
+        }
+
+        //Admin tidak bisa edit superadmin
+        if($user->role ==='superadmin' && $currentUser->role !=='superadmin'){
+            return redirect()->route('members.index')->with('error', 'maaf, anda tidak dapat mengedit superadmin');
+        }
+
+        //admin tidak dapat downgrade
+        if($currentUser->id === $user->id && $request->role !== $currentUser->role){
+            return redirect()->route('members.edit',$id)->with('error', 'maaf, anda tidak bisa mengubah role diri sendiri');
+        }
+
+        //admin tidak bisa upgrade ke superadmin
+        if($currentUser->role === 'admin' && $request->role ==='superadmin'){
+            return redirect()->route('members.edit', $id)->with('error', 'maaf, anda tidak bisa naik tingkat ke superadmin');
+        }
 
             $request->validate([
                 'name'     => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/',
@@ -83,7 +104,7 @@ class MemberController extends Controller
                 'alamat'   => 'nullable|string|max:500',
                 'divisi'   => 'nullable|string|max:100',
                 'nim'      => 'nullable|string|max:20',
-                'angkatan' => 'nullable|digits:4',
+                'angkatan' => 'nullable|digits:2',
             ]);
 
         DB::transaction(function () use ($request, $user) {
@@ -117,17 +138,27 @@ class MemberController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
+        $currentUser = Auth::user();
+
+        // Defensive: cek role yang melakukan aksi
+        if (!in_array($currentUser->role, ['superadmin', 'admin'])) {
+            abort(403, 'Unauthorized action.');
+        }
 
         //super admin tidak dapat di hapus
         if ($user->role=== 'superadmin'){
-            return redirect()->route('members.index')->with('error', 'Superadmin tidak dapat dihapus!');
+            return redirect()->route('members.index')->with('error', 'Super admin tidak dapat dihapus!');
         }
-
-            if ($user->id === Auth::id()) {
+        //tidak bisa menghapus diri sendiri
+        if ($user->id === Auth::id()) {
             return redirect()->route('members.index')->with('error', 'Kamu tidak dapat menghapus akun sendiri!');
         }
-
-        DB::transaction(function () use ($user) {
+        //admin tidak bisa menghapus admin lain nya
+        if($currentUser->role === 'admin' && $user->role ==='admin'){
+            return redirect()->route('members.index')->with('error','Admin tidak bisa menghapus admin lainnya');
+        }
+        
+                DB::transaction(function () use ($user) {
             LogActivity::log('delete', 'Menghapus anggota: ' . $user->name, 'User', $user->id);
             $user->member()->delete();
             $user->delete();
@@ -140,10 +171,24 @@ class MemberController extends Controller
     public function resetPassword(Request $request, string $id)
     {
         $user = User::findOrFail($id);
+        $currentUser = Auth::user();
 
+        //defendsive: cek role yang melakukan
+        if(!in_array($currentUser->role, ['superadmin', 'admin'])){
+            abort(403,'akses di tolak');
+        }
+
+        //admin tidak bisa reset password superadmin
+        if($user->role === 'superadmin' && $currentUser->role !=='superadmin'){
+            return redirect()->route('members.edit')->with('error', 'anda tidak bisa mereset nyaa');
+        }
         //super admin tidak dapat di reset passwordnya
         if ($user->role === 'superadmin') {
             return redirect()->route('members.index')->with('error', 'Password superadmin tidak dapat direset!');
+        }
+        //admin tidak bisa mereset pass admin lainnya
+        if($user->role ==='admin' && $currentUser->role === 'admin' && $currentUser->id !== $user->id){
+            return redirect()->route('members.edit')->with('error', 'admin tidak dapat mereset admin lain nya');
         }
 
         $request->validate([
